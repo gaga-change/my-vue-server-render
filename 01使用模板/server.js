@@ -6,7 +6,7 @@ const server = require('express')()
 const renderer = require('vue-server-renderer').createRenderer({
   template: require('fs').readFileSync('./index.template.html', 'utf-8')
 })
-
+const createApp = require('./app')
 const context = {
   title: 'vue-ssr',
   meta: `
@@ -15,12 +15,8 @@ const context = {
 }
 
 server.get('*', (req, res) => {
-  const app = new Vue({
-    data: {
-      url: req.url
-    },
-    template: `<div>访问的 URL 是： {{ url }}</div>`
-  })
+  const data = { url: req.url }
+  const app = createApp(data)
   renderer.renderToString(app, context, (err, html) => {
     if (err) {
       res.status(500).end('Internal Server Error')
